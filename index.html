@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CWB Test Maker</title>
+<meta name="description" content="Free offline study app for CWB Visual Level 2. Make tests, take them and get them marked.">
+<meta name="theme-color" content="#1f5fa8">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Test Maker">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<style>
+:root{--bg:#fbf7ee;--card:#fff;--ink:#1b1b1b;--muted:#4f4f4f;--line:#d8cdb6;--acc:#1f5fa8;--soft:#e7eefa;--ok:#1b6e35;--okbg:#e2f2e6;--bad:#a8231b;--badbg:#fbe5e3;--warnbg:#fff1cc;--fs:20px}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Verdana,Tahoma,"Trebuchet MS","Segoe UI",Arial,sans-serif;font-size:var(--fs);line-height:1.6;letter-spacing:.02em;word-spacing:.06em;padding:0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+header{position:sticky;top:0;z-index:10;background:var(--bg);border-bottom:2px solid var(--line);padding-top:env(safe-area-inset-top)}
+nav{display:flex;gap:4px;max-width:800px;margin:0 auto;padding:6px}
+.tab{flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;gap:2px;background:transparent;color:var(--ink);border:2px solid transparent;border-radius:12px;padding:6px 2px;min-height:58px}
+.tab .ti{font-size:22px;line-height:1}
+.tab .tl{font-size:14px;letter-spacing:0;word-spacing:0}
+.tab.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+main{max-width:800px;margin:0 auto;padding:10px 14px 90px}
+main:focus,[tabindex="-1"]:focus{outline:none}
+h1{font-size:1.4em;line-height:1.3;margin:.4em 0 .5em}
+h2{font-size:1.15em;line-height:1.35;margin:.2em 0 .5em}
+h3{font-size:1.05em;line-height:1.4;margin:.2em 0 .4em}
+p{margin:.4em 0 .6em}
+.card{background:var(--card);border:2px solid var(--line);border-radius:16px;padding:14px 16px;margin:12px 0}
+.card.ok{background:var(--okbg);border-color:var(--ok)}
+.card.bad{background:var(--badbg);border-color:var(--bad)}
+.card.warn{background:var(--warnbg);border-color:#d9a400}
+button,.btn{font:inherit;font-size:1em;font-weight:normal;line-height:1.3;min-height:52px;padding:12px 18px;border-radius:14px;border:2px solid var(--acc);background:var(--acc);color:#fff;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-align:center;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+button.alt,.btn.alt{background:#fff;color:var(--acc)}
+button.danger{background:#fff;color:var(--bad);border-color:var(--bad)}
+button.armed{background:var(--bad);color:#fff;border-color:var(--bad)}
+button.sm{min-height:44px;padding:8px 14px;font-size:.9em}
+button.link{background:none;border:none;color:var(--acc);padding:8px 4px;min-height:44px;text-decoration:underline}
+button.wide,.btn.wide{width:100%;margin:8px 0}
+button:disabled{opacity:.4;cursor:not-allowed}
+:focus-visible{outline:3px solid #e0a100;outline-offset:2px}
+label{display:block;font-weight:bold;margin:12px 0 6px}
+input,select,textarea{font:inherit;font-size:1em;width:100%;padding:12px;border:2px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);min-height:52px}
+textarea{min-height:110px;line-height:1.4;resize:vertical}
+#pasteBox,#restoreBox,#promptBox{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.72em;min-height:220px}
+fieldset{border:2px solid var(--line);border-radius:12px;padding:8px 12px;margin:12px 0;min-width:0}
+legend{font-weight:bold;padding:0 6px}
+label.check,label.radio{display:flex;align-items:center;gap:10px;font-weight:normal;margin:6px 0;min-height:44px}
+label.check input,label.radio input{width:26px;height:26px;min-height:0;margin:0;flex:none;padding:0}
+.muted{color:var(--muted);font-size:.85em}
+.center{text-align:center}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.stack{display:flex;flex-direction:column}
+.navrow{display:flex;gap:10px;margin:16px 0}
+.navrow button{flex:1;min-width:0}
+.opt{display:flex;width:100%;text-align:left;justify-content:flex-start;align-items:flex-start;background:#fff;color:var(--ink);border-color:var(--line);margin:10px 0;padding:14px;gap:12px}
+.opt .let{flex:none;width:1.8em;height:1.8em;border-radius:50%;border:2px solid currentColor;display:inline-flex;align-items:center;justify-content:center;font-weight:bold;font-size:.85em}
+.opt .otext{flex:1;min-width:0;overflow-wrap:anywhere}
+.opt.pick{border-color:var(--acc);background:var(--soft);font-weight:bold;box-shadow:inset 0 0 0 2px var(--acc)}
+.opt.right{border-color:var(--ok);background:var(--okbg);font-weight:bold}
+.opt.wrong{border-color:var(--bad);background:var(--badbg)}
+.opt:disabled{opacity:1;cursor:default}
+.opt.dim:disabled{opacity:.75}
+.bar{height:14px;background:var(--line);border-radius:7px;overflow:hidden;margin:6px 0 10px}
+.bar i{display:block;height:100%;background:var(--acc);border-radius:7px}
+.big{font-size:3em;font-weight:bold;line-height:1.1}
+.big2{font-size:1.5em;font-weight:bold;min-width:3.2em;text-align:center}
+.badge{display:inline-block;padding:6px 16px;border-radius:999px;font-weight:bold;font-size:1.1em}
+.badge.pass{background:var(--okbg);color:var(--ok);border:2px solid var(--ok)}
+.badge.fail{background:var(--badbg);color:var(--bad);border:2px solid var(--bad)}
+.hook{border-left:6px solid #e0a100;background:#fff8e1;padding:8px 12px;border-radius:8px}
+.quizhead{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:6px}
+.tag{background:var(--acc);color:#fff;border-radius:999px;padding:2px 12px;font-size:.85em;font-weight:bold}
+.hrow{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.hrow:last-child{border-bottom:none}
+.hrow>div:first-child{min-width:0;overflow-wrap:anywhere}
+.hscore{font-weight:bold;white-space:nowrap}
+.qrow{border-top:1px solid var(--line);padding:10px 0}
+.qrow p{margin:0 0 8px;overflow-wrap:anywhere}
+.chhead{width:100%;justify-content:space-between;background:none;color:var(--ink);border:none;padding:4px 0;min-height:48px;font-weight:bold;text-align:left}
+.chhead span:first-child{min-width:0;overflow-wrap:anywhere}
+.erow{display:grid;grid-template-columns:auto 1fr;gap:8px 10px;align-items:center;margin:10px 0;padding-bottom:10px;border-bottom:1px dashed var(--line)}
+.erow input.small{grid-column:1/-1;font-size:.85em;min-height:44px}
+.erow label.radio{margin:0}
+.steps{padding-left:1.4em}
+.steps li{margin:6px 0}
+#banner{padding:0 14px}
+#banner .banner{max-width:772px;margin:8px auto;padding:10px 14px;border-radius:12px;border:2px solid var(--line);background:#fff}
+.banner.warn{background:var(--warnbg)!important;border-color:#d9a400!important}
+.banner.bad{background:var(--badbg)!important;border-color:var(--bad)!important}
+.banner.info{background:var(--soft)!important;border-color:var(--acc)!important}
+.note{background:var(--soft);border-radius:12px;padding:8px 12px}
+details{margin:12px 0}
+summary{cursor:pointer;font-weight:bold;min-height:44px;padding:8px 0}
+.visually-hidden{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0;padding:0;margin:-1px}
+@media (max-width:380px){.tab .tl{font-size:12px}}
+</style>
+</head>
+<body>
+<header><nav id="nav" aria-label="Main"></nav></header>
+<div id="banner" aria-live="polite"></div>
+<main id="app" tabindex="-1"><p style="padding:20px">Loading…</p></main>
+<noscript><p style="padding:20px">This app needs JavaScript turned on.</p></noscript>
+<script>
+'use strict';
+const VERSION = '1.0.0';
+const DB_NAME = 'cwb-test-maker', DB_STORE = 'kv', DB_KEY = 'state', LS_KEY = 'cwb-test-maker-state';
+const DAY = 86400000;
+const LETTERS = 'ABCDEF';
+const SIZES = [18, 20, 23, 26];
+const MODES = {learn: '📖 Knowledge', exam: '📝 Exam', redo: '🔁 Redo'};
+
+const DEMO = [
+  {chapter: 'Demo', q: 'What does CJP stand for?',
+   options: ['Complete joint penetration', 'Critical joint pass', 'Cut joint preparation', 'Common joint profile'], answer: 0,
+   why: 'CJP means complete joint penetration. The weld goes all the way through the thickness of the joint.',
+   wrongWhy: ['', 'A “pass” is one layer of weld, not a type of joint.', 'Joint prep is the bevel you cut before welding, not the weld itself.', 'This isn’t a welding term.'],
+   hook: 'Feel a nail you hammered right through a board. You can feel the tip poke out the back. All the way through = complete.'},
+  {chapter: 'Demo', q: 'What does UT use to find flaws inside a weld?',
+   options: ['Magnetic particles', 'Sound waves', 'Coloured dye', 'Just your eyes'], answer: 1,
+   why: 'UT (ultrasonic testing) sends high-pitched sound into the steel and reads the echoes that bounce back off flaws.',
+   wrongWhy: ['Magnetic particles are MT (magnetic particle testing).', '', 'Coloured dye is PT (penetrant testing).', 'Looking with your eyes is VT (visual testing). It can’t see inside the weld.'],
+   hook: 'Shout in an empty arena and feel the echo hit you a second later. UT listens for the echo off a flaw.'},
+  {chapter: 'Demo', q: 'MT (magnetic particle testing) works on which steel?',
+   options: ['Any metal at all', 'Magnetic steel, like carbon steel', 'Aluminum', 'Austenitic stainless steel (like 304)'], answer: 1,
+   why: 'MT only works on metal that can be magnetized (ferromagnetic), like carbon steel.',
+   wrongWhy: ['It won’t work on metals that aren’t magnetic.', '', 'Aluminum isn’t magnetic, so MT won’t work.', 'Austenitic stainless isn’t magnetic, so MT won’t work.'],
+   hook: 'Feel a fridge magnet snap onto the fridge door. If a magnet won’t snap onto the steel, MT won’t work either.'}
+];
+
+let S = null;              // saved state
+let storage = 'idb';       // idb | local | memory
+let db = null;
+let saveChain = Promise.resolve();
+let saveFailed = false;
+let deferredInstall = null;
+let persisted = null;
+
+const UI = {
+  tab: 'study', qsub: null, editId: null, editDraft: null, openCh: null, find: '',
+  msg: null, armed: null, armTimer: null, resumeAsk: false, confirmFinish: false, showRight: false,
+  learnCh: '*', learnN: '10', examN: '40', examAll: true, examChs: [],
+  makeCh: '', makeN: '20', pasteDraft: '', restoreDraft: '', showPrompt: false, showRestorePaste: false,
+  askedPersist: false
+};
+
+/* ---------- small helpers ---------- */
+const $ = (sel, root = document) => root.querySelector(sel);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]));
+const nowISO = () => new Date().toISOString();
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 9);
+const range = n => Array.from({length: n}, (_, i) => i);
+function shuffle(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+function clampInt(v, lo, hi, d) { v = parseInt(v, 10); return Number.isFinite(v) ? Math.min(hi, Math.max(lo, v)) : d; }
+function cleanStr(x) { return (typeof x === 'string' || typeof x === 'number') ? String(x).replace(/\s+/g, ' ').trim() : ''; }
+function normKey(t) { const s = cleanStr(t).toLowerCase(); return s.replace(/[^a-z0-9]+/g, ' ').trim() || s; }
+function validISO(s) { if (typeof s !== 'string') return null; const d = new Date(s); return isNaN(d) ? null : d.toISOString(); }
+function fmtDate(iso) { const d = new Date(iso); if (isNaN(d)) return ''; return d.toLocaleDateString(undefined, {month: 'short', day: 'numeric', year: 'numeric'}) + ', ' + d.toLocaleTimeString(undefined, {hour: 'numeric', minute: '2-digit'}); }
+function pct(r, n) { return n ? Math.round(100 * r / n) : 0; }
+function plural(n, one, many) { return n + ' ' + (n === 1 ? one : (many || one + 's')); }
+function qById(id) { return S.bank.find(q => q.id === id); }
+function chapters() { return [...new Set(S.bank.map(q => q.chapter))].sort((a, b) => a.localeCompare(b, undefined, {numeric: true, sensitivity: 'base'})); }
+function chCount(c) { return S.bank.filter(q => q.chapter === c).length; }
+function isStandalone() { try { return matchMedia('(display-mode: standalone)').matches || navigator.standalone === true; } catch (e) { return false; } }
+function isIOS() { return /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1); }
+
+/* ---------- questions ---------- */
+function validateQ(x) {
+  if (!x || typeof x !== 'object' || Array.isArray(x)) return {ok: false, why: 'it isn’t a question'};
+  const q = cleanStr(x.q ?? x.question);
+  if (!q) return {ok: false, why: 'the question text is missing'};
+  let opts = x.options ?? x.choices;
+  if (!Array.isArray(opts)) return {ok: false, why: 'the list of answers is missing'};
+  opts = opts.map(cleanStr);
+  if (opts.length < 2) return {ok: false, why: 'it needs at least 2 answers'};
+  if (opts.length > 6) return {ok: false, why: 'it has more than 6 answers'};
+  if (opts.some(o => !o)) return {ok: false, why: 'one of the answers is blank'};
+  if (new Set(opts.map(o => o.toLowerCase())).size !== opts.length) return {ok: false, why: 'two answers are the same'};
+  let a = x.answer;
+  if (typeof a === 'string') {
+    const t = a.trim();
+    if (/^\d+$/.test(t)) a = Number(t);
+    else if (/^[a-f]$/i.test(t)) a = t.toUpperCase().charCodeAt(0) - 65;
+    else a = opts.findIndex(o => o.toLowerCase() === t.toLowerCase());
+  }
+  if (!Number.isInteger(a) || a < 0 || a >= opts.length) return {ok: false, why: 'the right answer is missing or doesn’t match one of the answers'};
+  const ww0 = Array.isArray(x.wrongWhy) ? x.wrongWhy.map(cleanStr) : [];
+  const wrongWhy = opts.map((_, i) => i === a ? '' : (ww0[i] || ''));
+  return {ok: true, q: {chapter: cleanStr(x.chapter) || 'General', q, options: opts, answer: a, why: cleanStr(x.why), wrongWhy, hook: cleanStr(x.hook)}};
+}
+function makeQ(v, keep) {
+  const s = keep && keep.st && typeof keep.st === 'object' ? keep.st : {};
+  return Object.assign({id: (keep && typeof keep.id === 'string' && keep.id) || uid()}, v, {
+    st: {right: clampInt(s.right, 0, 1e6, 0), wrong: clampInt(s.wrong, 0, 1e6, 0), streak: clampInt(s.streak, 0, 1, 0), redo: !!s.redo},
+    added: (keep && validISO(keep.added)) || nowISO(),
+    demo: !!(keep && keep.demo)
+  });
+}
+function addQuestions(state, list, keep) {
+  const keys = new Set(state.bank.map(q => normKey(q.q)));
+  const ids = new Set(state.bank.map(q => q.id));
+  const res = {added: 0, dup: 0, bad: []};
+  list.forEach((x, i) => {
+    const v = validateQ(x);
+    if (!v.ok) { res.bad.push({n: i + 1, why: v.why}); return; }
+    const k = normKey(v.q.q);
+    if (keys.has(k)) { res.dup++; return; }
+    const q = makeQ(v.q, keep ? x : null);
+    if (ids.has(q.id)) q.id = uid();
+    keys.add(k); ids.add(q.id);
+    state.bank.push(q); res.added++;
+  });
+  return res;
+}
+function recordAnswer(q, ok) {
+  if (ok) {
+    q.st.right++;
+    if (q.st.redo) { q.st.streak++; if (q.st.streak >= 2) { q.st.redo = false; q.st.streak = 0; } }
+  } else { q.st.wrong++; q.st.redo = true; q.st.streak = 0; }
+}
+function parseQuestions(text) {
+  const t = String(text || '').trim();
+  if (!t) return {error: 'The box is empty. Paste the questions from Claude first.'};
+  const unfenced = t.replace(/```[a-zA-Z]*\s*/g, '').replace(/```/g, '').trim();
+  const tries = [unfenced];
+  const s1 = unfenced.search(/[\[{]/), e1 = Math.max(unfenced.lastIndexOf(']'), unfenced.lastIndexOf('}'));
+  if (s1 >= 0 && e1 > s1) tries.push(unfenced.slice(s1, e1 + 1));
+  tries.push(tries[tries.length - 1].replace(/[“”„‟″]/g, '"'));
+  for (const x of tries) {
+    let v;
+    try { v = JSON.parse(x); } catch (e) { continue; }
+    if (v && typeof v === 'object' && !Array.isArray(v)) v = Array.isArray(v.questions) ? v.questions : Array.isArray(v.bank) ? v.bank : [v];
+    if (!Array.isArray(v)) continue;
+    if (!v.length) return {error: 'There were no questions in that paste.'};
+    return {list: v};
+  }
+  return {error: 'That paste didn’t work. Copy everything Claude wrote (from the first [ to the last ]) and try again.'};
+}
+
+/* ---------- state ---------- */
+function freshState(withDemo) {
+  const st = {v: 1, created: nowISO(), savedAt: null, bank: [], hist: [], settings: {pass: 70, size: 1}, lastBackup: null, snoozeUntil: null, session: null};
+  if (withDemo) addQuestions(st, DEMO.map(d => Object.assign({demo: true}, d)), true);
+  return st;
+}
+function cleanHist(h) {
+  if (!h || typeof h !== 'object') return null;
+  const n = clampInt(h.n, 0, 1e5, 0);
+  if (!n) return null;
+  return {id: typeof h.id === 'string' && h.id ? h.id : uid(), date: validISO(h.date) || nowISO(),
+    mode: MODES[h.mode] ? h.mode : 'learn', label: cleanStr(h.label).slice(0, 120) || 'Test',
+    right: clampInt(h.right, 0, n, 0), n, pass: h.pass === true ? true : h.pass === false ? false : null,
+    passMark: clampInt(h.passMark, 1, 100, 70)};
+}
+function cleanItem(it) {
+  if (!it || typeof it.qid !== 'string') return null;
+  return {qid: it.qid, order: Array.isArray(it.order) ? it.order : [], pick: Number.isInteger(it.pick) ? it.pick : null};
+}
+function cleanSession(s) {
+  if (!s || typeof s !== 'object' || !MODES[s.mode]) return null;
+  const out = {id: typeof s.id === 'string' ? s.id : uid(), mode: s.mode, label: cleanStr(s.label) || 'Test',
+    created: validISO(s.created) || nowISO(), finished: !!s.finished, note: cleanStr(s.note), passMark: clampInt(s.passMark, 1, 100, 70)};
+  if (s.mode === 'redo') {
+    out.ids = Array.isArray(s.ids) ? s.ids.filter(x => typeof x === 'string') : [];
+    out.queue = Array.isArray(s.queue) ? s.queue.filter(x => typeof x === 'string') : [];
+    out.cur = cleanItem(s.cur);
+    out.answered = clampInt(s.answered, 0, 1e6, 0);
+    out.right = clampInt(s.right, 0, out.answered, 0);
+    if (!out.ids.length) return null;
+  } else {
+    out.items = Array.isArray(s.items) ? s.items.map(cleanItem).filter(Boolean) : [];
+    if (!out.items.length) return null;
+    out.i = clampInt(s.i, 0, out.items.length - 1, 0);
+    out.result = s.result && typeof s.result === 'object' ? {right: clampInt(s.result.right, 0, 1e5, 0), n: clampInt(s.result.n, 0, 1e5, 0)} : null;
+    if (out.finished && !out.result) return null;
+  }
+  return out;
+}
+function normalizeState(raw) {
+  if (!raw || typeof raw !== 'object' || !Array.isArray(raw.bank)) return freshState(true);
+  const st = freshState(false);
+  st.created = validISO(raw.created) || st.created;
+  st.savedAt = validISO(raw.savedAt);
+  st.lastBackup = validISO(raw.lastBackup);
+  st.snoozeUntil = validISO(raw.snoozeUntil);
+  addQuestions(st, raw.bank, true);
+  st.hist = Array.isArray(raw.hist) ? raw.hist.map(cleanHist).filter(Boolean) : [];
+  if (raw.settings && typeof raw.settings === 'object') {
+    st.settings.pass = clampInt(raw.settings.pass, 1, 100, 70);
+    st.settings.size = clampInt(raw.settings.size, 0, SIZES.length - 1, 1);
+  }
+  st.session = cleanSession(raw.session);
+  return st;
+}
+
+/* ---------- storage ---------- */
+function withTimeout(p, ms) { return new Promise((res, rej) => { const t = setTimeout(() => rej(new Error('timeout')), ms); p.then(v => { clearTimeout(t); res(v); }, e => { clearTimeout(t); rej(e); }); }); }
+function idbOpen() {
+  return withTimeout(new Promise((res, rej) => {
+    const r = indexedDB.open(DB_NAME, 1);
+    r.onupgradeneeded = () => { if (!r.result.objectStoreNames.contains(DB_STORE)) r.result.createObjectStore(DB_STORE); };
+    r.onsuccess = () => res(r.result);
+    r.onerror = () => rej(r.error);
+    r.onblocked = () => rej(new Error('blocked'));
+  }), 4000);
+}
+function idbGet() {
+  return new Promise((res, rej) => {
+    const tx = db.transaction(DB_STORE, 'readonly');
+    const rq = tx.objectStore(DB_STORE).get(DB_KEY);
+    rq.onsuccess = () => res(rq.result || null);
+    rq.onerror = () => rej(rq.error);
+  });
+}
+function idbPut(v) {
+  return new Promise((res, rej) => {
+    const tx = db.transaction(DB_STORE, 'readwrite');
+    tx.objectStore(DB_STORE).put(v, DB_KEY);
+    tx.oncomplete = () => res();
+    tx.onerror = () => rej(tx.error);
+    tx.onabort = () => rej(tx.error || new Error('aborted'));
+  });
+}
+async function loadState() {
+  let a = null, b = null;
+  try { db = await idbOpen(); a = await idbGet(); storage = 'idb'; }
+  catch (e) { console.warn('IndexedDB not available', e); storage = 'local'; }
+  try { const t = localStorage.getItem(LS_KEY); if (t) b = JSON.parse(t); } catch (e) { b = null; }
+  if (storage === 'local') {
+    try { localStorage.setItem(LS_KEY + '-test', '1'); localStorage.removeItem(LS_KEY + '-test'); } catch (e) { storage = 'memory'; }
+  }
+  const newer = (x, y) => !x ? y : !y ? x : ((Date.parse(y.savedAt) || 0) > (Date.parse(x.savedAt) || 0) ? y : x);
+  return normalizeState(newer(a, b));
+}
+async function writeState(st) {
+  st.savedAt = nowISO();
+  if (storage === 'idb') {
+    try { await idbPut(st); saveFailed = false; return; }
+    catch (e) { console.warn('IndexedDB save failed', e); storage = 'local'; }
+  }
+  if (storage === 'local') {
+    try { localStorage.setItem(LS_KEY, JSON.stringify(st)); saveFailed = false; return; }
+    catch (e) { console.warn('localStorage save failed', e); storage = 'memory'; }
+  }
+  saveFailed = true;
+  renderBanner();
+}
+function save() {
+  const st = S;
+  saveChain = saveChain.then(() => writeState(st)).catch(e => { console.error(e); saveFailed = true; renderBanner(); });
+  return saveChain;
+}
+function ensurePersist() {
+  if (UI.askedPersist || !navigator.storage || !navigator.storage.persist) return;
+  UI.askedPersist = true;
+  navigator.storage.persisted().then(p => p || navigator.storage.persist()).then(p => { persisted = !!p; }).catch(() => {});
+}
+
+/* ---------- sessions ---------- */
+function newItem(q) { return {qid: q.id, order: shuffle(range(q.options.length)), pick: null}; }
+function fixItem(it) {
+  const q = qById(it.qid);
+  if (!q) return null;
+  const n = q.options.length;
+  const okOrder = Array.isArray(it.order) && it.order.length === n && new Set(it.order).size === n && it.order.every(x => Number.isInteger(x) && x >= 0 && x < n);
+  if (!okOrder) { it.order = shuffle(range(n)); it.pick = null; }
+  if (it.pick !== null && !(Number.isInteger(it.pick) && it.pick >= 0 && it.pick < n)) it.pick = null;
+  return it;
+}
+function fixSession() {
+  const s = S.session;
+  if (!s) return;
+  const before = JSON.stringify(s);
+  if (s.mode === 'redo') {
+    s.ids = s.ids.filter(id => qById(id));
+    s.queue = s.queue.filter(id => qById(id));
+    if (s.cur) s.cur = fixItem(s.cur);
+    if (!s.finished && !s.cur) {
+      const nid = s.queue.shift();
+      if (nid) s.cur = newItem(qById(nid));
+      else if (s.answered > 0) { s.finished = true; s.cur = null; }
+      else S.session = null;
+    }
+    if (S.session && !s.ids.length) S.session = null;
+  } else {
+    s.items = s.items.map(fixItem).filter(Boolean);
+    if (!s.items.length) S.session = null;
+    else s.i = Math.min(Math.max(0, s.i), s.items.length - 1);
+  }
+  if (S.session !== s || JSON.stringify(s) !== before) save();
+}
+function guardSession() {
+  const s = S.session;
+  if (s && !s.finished) {
+    UI.tab = 'study'; UI.qsub = null; UI.resumeAsk = true;
+    flash('study', 'bad', 'You have a test in progress. Keep going, or throw it away first.');
+    return false;
+  }
+  if (s) S.session = null;
+  return true;
+}
+function beginSession(sess) {
+  S.session = sess;
+  UI.tab = 'study'; UI.qsub = null; UI.msg = null; UI.resumeAsk = false; UI.confirmFinish = false; UI.showRight = false;
+  save(); render(true);
+}
+function startLearn(ch, n) {
+  if (!guardSession()) return;
+  const pool = shuffle(S.bank.filter(q => ch === '*' || q.chapter === ch));
+  if (!pool.length) { flash('study', 'bad', 'There are no questions in that chapter yet.'); return; }
+  const want = n === 'all' ? pool.length : clampInt(n, 1, 10000, 10);
+  const count = Math.min(want, pool.length);
+  beginSession({id: uid(), mode: 'learn', label: ch === '*' ? 'All chapters' : ch, created: nowISO(), finished: false,
+    note: count < want ? `You asked for ${want}, but there ${pool.length === 1 ? 'is' : 'are'} only ${plural(pool.length, 'question')}, so you’ll get ${count}.` : '',
+    items: pool.slice(0, count).map(newItem), i: 0, result: null, passMark: S.settings.pass});
+}
+function startExam() {
+  if (!guardSession()) return;
+  const all = chapters();
+  const chs = UI.examAll ? null : UI.examChs.filter(c => all.includes(c));
+  if (chs && !chs.length) { flash('study', 'bad', 'Pick at least one chapter for the exam.'); return; }
+  const pool = shuffle(S.bank.filter(q => !chs || chs.includes(q.chapter)));
+  if (!pool.length) { flash('study', 'bad', 'There are no questions for that exam yet.'); return; }
+  const want = clampInt(UI.examN, 25, 50, 40);
+  const count = Math.min(want, pool.length);
+  beginSession({id: uid(), mode: 'exam', label: !chs ? 'All chapters' : chs.length === 1 ? chs[0] : plural(chs.length, 'chapter'), created: nowISO(), finished: false,
+    note: count < want ? `You asked for ${want} questions, but you only have ${pool.length}, so this exam has ${count}.` : '',
+    items: pool.slice(0, count).map(newItem), i: 0, result: null, passMark: S.settings.pass});
+}
+function startRedo() {
+  if (!guardSession()) return;
+  const pool = shuffle(S.bank.filter(q => q.st.redo));
+  if (!pool.length) { flash('study', 'ok', 'Nothing to redo right now 🎉'); return; }
+  const first = pool.shift();
+  beginSession({id: uid(), mode: 'redo', label: 'Wrong ones', created: nowISO(), finished: false, note: '',
+    ids: [first.id].concat(pool.map(q => q.id)), queue: pool.map(q => q.id), cur: newItem(first), answered: 0, right: 0, passMark: S.settings.pass});
+}
+function curItem() { const s = S.session; if (!s) return null; return s.mode === 'redo' ? s.cur : s.items[s.i]; }
+function pick(orig) {
+  const s = S.session;
+  if (!s || s.finished || UI.resumeAsk) return;
+  const it = curItem();
+  if (!it) return;
+  const q = qById(it.qid);
+  if (!q || !Number.isInteger(orig) || orig < 0 || orig >= q.options.length) return;
+  if (s.mode === 'exam') { it.pick = orig; UI.confirmFinish = false; save(); render(); return; }
+  if (it.pick !== null) return;
+  it.pick = orig;
+  const ok = orig === q.answer;
+  recordAnswer(q, ok);
+  if (s.mode === 'redo') { s.answered++; if (ok) s.right++; }
+  save(); render();
+  const fb = $('#feedback');
+  if (fb && fb.scrollIntoView) fb.scrollIntoView({behavior: 'smooth', block: 'nearest'});
+}
+function next() {
+  const s = S.session;
+  if (!s || s.finished) return;
+  if (s.mode === 'redo') {
+    if (!s.cur || s.cur.pick === null) return;
+    const q = qById(s.cur.qid);
+    if (q && q.st.redo && !s.queue.includes(q.id)) s.queue.push(q.id);
+    let nid = s.queue.shift();
+    while (nid && !qById(nid)) nid = s.queue.shift();
+    if (!nid) { finishRedo(); return; }
+    s.cur = newItem(qById(nid));
+    save(); render(true); return;
+  }
+  if (s.mode === 'learn' && s.items[s.i].pick === null) return;
+  if (s.i < s.items.length - 1) { s.i++; UI.confirmFinish = false; save(); render(true); }
+  else finishAsk();
+}
+function back() {
+  const s = S.session;
+  if (!s || s.finished || !s.items || s.i <= 0) return;
+  s.i--; UI.confirmFinish = false; save(); render(true);
+}
+function finishAsk() {
+  const s = S.session;
+  if (!s || s.finished) return;
+  if (s.mode !== 'exam') { finishTest(); return; }
+  const left = s.items.filter(x => x.pick === null).length;
+  if (left && !UI.confirmFinish) {
+    UI.confirmFinish = true; render();
+    const c = $('#confirmFinish');
+    if (c && c.scrollIntoView) c.scrollIntoView({behavior: 'smooth', block: 'center'});
+    return;
+  }
+  finishTest();
+}
+function finishTest() {
+  const s = S.session;
+  if (!s || s.finished || s.mode === 'redo') return;
+  let right = 0, n = 0;
+  s.items.forEach(it => {
+    const q = qById(it.qid);
+    if (!q) return;
+    if (s.mode === 'exam') { const ok = it.pick === q.answer; recordAnswer(q, ok); n++; if (ok) right++; }
+    else if (it.pick !== null) { n++; if (it.pick === q.answer) right++; }
+  });
+  UI.confirmFinish = false; UI.showRight = false;
+  if (!n) { S.session = null; save(); flash('study', 'ok', 'Nothing was answered, so no score was saved.'); return; }
+  s.finished = true; s.passMark = S.settings.pass; s.result = {right, n};
+  S.hist.unshift({id: uid(), date: nowISO(), mode: s.mode, label: s.label, right, n, pass: right * 100 >= s.passMark * n, passMark: s.passMark});
+  if (S.hist.length > 1000) S.hist.length = 1000;
+  save(); render(true);
+}
+function finishRedo() {
+  const s = S.session;
+  if (!s || s.mode !== 'redo') return;
+  if (!s.answered) { S.session = null; save(); go('study'); return; }
+  s.finished = true; s.cur = null; s.queue = [];
+  S.hist.unshift({id: uid(), date: nowISO(), mode: 'redo', label: 'Wrong ones', right: s.right, n: s.answered, pass: null, passMark: S.settings.pass});
+  save(); render(true);
+}
+
+/* ---------- views ---------- */
+function msgHtml(view) {
+  if (!UI.msg || UI.msg.view !== view) return '';
+  return `<div class="card msg ${UI.msg.kind}" role="status">${esc(UI.msg.text).replace(/\n/g, '<br>')}</div>`;
+}
+function confirmBtn(act, key, label, armedLabel, cls, extra) {
+  return `<button class="${cls || ''}" data-act="${act}" data-confirm="${esc(key)}" data-confirm-text="${esc(armedLabel)}" ${extra || ''}>${label}</button>`;
+}
+function chOptions(sel) {
+  const chs = chapters();
+  if (sel !== '*' && !chs.includes(sel)) { UI.learnCh = sel = '*'; }
+  return `<option value="*">All chapters (${S.bank.length})</option>` + chs.map(c => `<option value="${esc(c)}" ${c === sel ? 'selected' : ''}>${esc(c)} (${chCount(c)})</option>`).join('');
+}
+function weakestHtml() {
+  const rows = chapters().map(c => {
+    let r = 0, w = 0;
+    S.bank.forEach(q => { if (q.chapter === c) { r += q.st.right; w += q.st.wrong; } });
+    return {c, n: r + w, p: r + w ? r / (r + w) : 1};
+  }).filter(x => x.n >= 3 && x.p < 1).sort((a, b) => a.p - b.p).slice(0, 3);
+  if (!rows.length) return '';
+  return `<section class="card"><h2>🎯 Weakest chapters</h2>` + rows.map(x =>
+    `<div class="hrow"><div><b>${esc(x.c)}</b><br><span class="muted">${Math.round(100 * x.p)}% right (${plural(x.n, 'answer')})</span></div><button class="alt sm" data-act="practiceCh" data-ch="${esc(x.c)}">Practice</button></div>`).join('') + `</section>`;
+}
+function viewStudy() {
+  let h = msgHtml('study');
+  if (!S.bank.length) {
+    return h + `<section class="card"><h1>Welcome 👋</h1><p>You don’t have any questions yet. Add some to start studying.</p>
+      <button class="wide" data-act="goMake">✨ Make questions with Claude</button>
+      <button class="wide alt" data-act="goPaste">📋 Paste questions</button></section>`;
+  }
+  const chs = chapters();
+  UI.examChs = UI.examChs.filter(c => chs.includes(c));
+  const nRedo = S.bank.filter(q => q.st.redo).length;
+  h += `<h1>Study</h1>`;
+  h += `<section class="card"><h2>📖 Knowledge mode</h2><p class="muted">Learn as you go. You see the answer right after each question.</p>
+    <label for="learnCh">Chapter</label><select id="learnCh" data-ui="learnCh">${chOptions(UI.learnCh)}</select>
+    <label for="learnN">How many questions?</label><select id="learnN" data-ui="learnN">${['5', '10', '20', '50', 'all'].map(v => `<option value="${v}" ${UI.learnN === v ? 'selected' : ''}>${v === 'all' ? 'All' : v}</option>`).join('')}</select>
+    <button class="wide" data-act="startLearn">Start ▶</button></section>`;
+  h += `<section class="card"><h2>📝 Exam mode</h2><p class="muted">A practice exam. No answers until the end. Then you see why each wrong answer is wrong and why the right one is right.</p>
+    <label for="examN">How many questions?</label><select id="examN" data-ui="examN">${['25', '30', '35', '40', '45', '50'].map(v => `<option value="${v}" ${UI.examN === v ? 'selected' : ''}>${v}</option>`).join('')}</select>
+    <fieldset><legend>Chapters</legend><label class="check"><input type="checkbox" data-ui-check="examAll" ${UI.examAll ? 'checked' : ''}> All chapters</label>
+    ${UI.examAll ? '' : chs.map(c => `<label class="check"><input type="checkbox" data-exch="${esc(c)}" ${UI.examChs.includes(c) ? 'checked' : ''}> ${esc(c)} <span class="muted">(${chCount(c)})</span></label>`).join('')}</fieldset>
+    <button class="wide" data-act="startExam">Start exam ▶</button></section>`;
+  h += `<section class="card"><h2>🔁 Redo my wrong ones</h2>${nRedo
+    ? `<p>${plural(nRedo, 'question')} to fix. Get each one right 2 times in a row to clear it.</p><button class="wide" data-act="startRedo">Redo ${nRedo} ▶</button>`
+    : `<p>Nothing to redo right now 🎉</p>`}</section>`;
+  h += weakestHtml();
+  return h;
+}
+function viewResume() {
+  const s = S.session;
+  const where = s.mode === 'redo' ? '🔁 Redo my wrong ones' : `${MODES[s.mode]}: question ${s.i + 1} of ${s.items.length}`;
+  return msgHtml('study') + `<section class="card"><h1>Welcome back 👋</h1><p>You have a test in progress:</p>
+    <p><b>${esc(where)}</b><br><span class="muted">${esc(s.label)}</span></p>
+    <button class="wide" data-act="resume">▶ Keep going</button>
+    ${confirmBtn('discard', 'discard', '🗑 Throw it away', 'Tap again to throw it away', 'danger wide')}</section>`;
+}
+function optionsHtml(q, it, isExam, answered) {
+  return `<div class="opts" role="group" aria-label="Answers">` + it.order.map((orig, pos) => {
+    let cls = 'opt', icon = '';
+    if (isExam) { if (it.pick === orig) cls += ' pick'; }
+    else if (answered) {
+      if (orig === q.answer) { cls += ' right'; icon = ' ✅'; }
+      else if (orig === it.pick) { cls += ' wrong'; icon = ' ❌'; }
+      else cls += ' dim';
+    }
+    return `<button class="${cls}" data-act="pick" data-orig="${orig}" aria-pressed="${it.pick === orig}" ${answered ? 'disabled' : ''}><span class="let">${LETTERS[pos]}</span><span class="otext">${esc(q.options[orig])}${icon}</span></button>`;
+  }).join('') + `</div>`;
+}
+function feedbackHtml(q, p) {
+  const ok = p === q.answer;
+  let h = `<section id="feedback" class="card ${ok ? 'ok' : 'bad'}" aria-live="polite"><h3>${ok ? '✅ Right!' : '❌ Not quite.'}</h3>`;
+  if (!ok) {
+    if (q.wrongWhy[p]) h += `<p><b>Why your answer is wrong:</b> ${esc(q.wrongWhy[p])}</p>`;
+    h += `<p><b>Right answer:</b> ${esc(q.options[q.answer])}</p>`;
+  }
+  if (q.why) h += `<p><b>Why it’s right:</b> ${esc(q.why)}</p>`;
+  if (q.hook) h += `<p class="hook">💡 ${esc(q.hook)}</p>`;
+  return h + `</section>`;
+}
+function viewQuiz() {
+  const s = S.session;
+  if (s.mode === 'redo') return viewRedo();
+  const it = s.items[s.i], q = qById(it.qid), n = s.items.length;
+  const isExam = s.mode === 'exam';
+  const answered = !isExam && it.pick !== null;
+  const left = isExam ? s.items.filter(x => x.pick === null).length : 0;
+  const last = s.i === n - 1;
+  let h = `<div class="quizhead"><span class="tag">${MODES[s.mode]}</span><span class="muted">${esc(s.label)}</span></div>
+    <p><b>Question ${s.i + 1} of ${n}</b>${isExam ? ` <span class="muted">· ${n - left} answered</span>` : ''}</p>
+    <div class="bar" role="progressbar" aria-label="Progress" aria-valuemin="0" aria-valuemax="${n}" aria-valuenow="${s.i + 1}"><i style="width:${Math.round(100 * (s.i + 1) / n)}%"></i></div>`;
+  if (s.note && s.i === 0) h += `<p class="note">ℹ️ ${esc(s.note)}</p>`;
+  h += `<section class="card"><h2 id="qtext" tabindex="-1">${esc(q.q)}</h2>${optionsHtml(q, it, isExam, answered)}</section>`;
+  if (answered) h += feedbackHtml(q, it.pick);
+  if (isExam && UI.confirmFinish && left) {
+    h += `<section id="confirmFinish" class="card warn" role="alert"><p><b>${plural(left, 'question')} ${left === 1 ? 'has' : 'have'} no answer.</b> ${left === 1 ? 'It' : 'They'} will count as wrong.</p>
+      <button class="wide" data-act="gotoUnanswered">Go to the first one with no answer</button><button class="wide alt" data-act="finishTest">Finish anyway</button></section>`;
+  }
+  h += `<div class="navrow"><button class="alt" data-act="back" ${s.i === 0 ? 'disabled' : ''}>◀ Back</button>`;
+  h += isExam ? `<button data-act="next">${last ? 'Finish exam ✔' : 'Next ▶'}</button>`
+              : `<button data-act="next" ${answered ? '' : 'disabled'}>${last ? 'See my results ✔' : 'Next ▶'}</button>`;
+  h += `</div><div class="row"><button class="link" data-act="finishNow">Finish now</button><button class="link" data-act="pause">Pause</button></div>`;
+  return h;
+}
+function viewRedo() {
+  const s = S.session, it = s.cur, q = qById(it.qid);
+  const total = s.ids.length;
+  const cleared = s.ids.filter(id => { const x = qById(id); return x && !x.st.redo; }).length;
+  const answered = it.pick !== null;
+  let tip;
+  if (!answered) tip = q.st.streak === 1 ? 'Get this one right 1 more time to clear it.' : 'Get this one right 2 times in a row to clear it.';
+  else if (it.pick !== q.answer) tip = 'Back in the pile. Get it right 2 times in a row to clear it.';
+  else tip = q.st.redo ? 'Nice! 1 more time to clear it.' : '🎉 Cleared!';
+  const remaining = s.queue.length + (answered ? (q.st.redo ? 1 : 0) : 1);
+  let h = `<div class="quizhead"><span class="tag">${MODES.redo}</span><span class="muted">Wrong ones</span></div>
+    <p><b>Cleared ${cleared} of ${total}</b></p>
+    <div class="bar" role="progressbar" aria-label="Cleared" aria-valuemin="0" aria-valuemax="${total}" aria-valuenow="${cleared}"><i style="width:${pct(cleared, total)}%"></i></div>
+    <p class="muted">${tip}</p>
+    <section class="card"><h2 id="qtext" tabindex="-1">${esc(q.q)}</h2>${optionsHtml(q, it, false, answered)}</section>`;
+  if (answered) h += feedbackHtml(q, it.pick);
+  h += `<div class="navrow"><button class="alt" data-act="stopRedo">Stop for now</button><button data-act="next" ${answered ? '' : 'disabled'}>${remaining ? 'Next ▶' : 'See results ✔'}</button></div>`;
+  return h;
+}
+function reviewHtml(it, num) {
+  const q = qById(it.qid);
+  if (!q) return '';
+  const ok = it.pick === q.answer;
+  let h = `<article class="card ${ok ? 'ok' : 'bad'}"><p class="muted">Question ${num} · ${esc(q.chapter)}</p><h3>${esc(q.q)}</h3>`;
+  if (ok) {
+    h += `<p>✅ <b>Your answer:</b> ${esc(q.options[q.answer])}</p>`;
+    if (q.why) h += `<p><b>Why it’s right:</b> ${esc(q.why)}</p>`;
+  } else {
+    if (it.pick === null) h += `<p>❌ <b>You didn’t answer this one.</b></p>`;
+    else {
+      h += `<p>❌ <b>Your answer:</b> ${esc(q.options[it.pick])}</p>`;
+      if (q.wrongWhy[it.pick]) h += `<p><b>Why it’s wrong:</b> ${esc(q.wrongWhy[it.pick])}</p>`;
+    }
+    h += `<p>✅ <b>Right answer:</b> ${esc(q.options[q.answer])}</p>`;
+    if (q.why) h += `<p><b>Why it’s right:</b> ${esc(q.why)}</p>`;
+  }
+  if (q.hook) h += `<p class="hook">💡 ${esc(q.hook)}</p>`;
+  return h + `</article>`;
+}
+function viewResults() {
+  const s = S.session;
+  const hasRedo = S.bank.some(q => q.st.redo);
+  if (s.mode === 'redo') {
+    const total = s.ids.length;
+    const left = s.ids.map(qById).filter(q => q && q.st.redo);
+    let h = `<section class="card center"><div class="big">🔁</div><p><b>You cleared ${total - left.length} of ${total}.</b></p><p class="muted">${s.right} right out of ${plural(s.answered, 'try', 'tries')}.</p></section>`;
+    h += left.length ? `<h2>Still to fix (${left.length})</h2>` + left.map(q => `<article class="card"><h3>${esc(q.q)}</h3><p>✅ <b>Right answer:</b> ${esc(q.options[q.answer])}</p>${q.why ? `<p><b>Why it’s right:</b> ${esc(q.why)}</p>` : ''}${q.hook ? `<p class="hook">💡 ${esc(q.hook)}</p>` : ''}</article>`).join('')
+      : `<p class="card ok">🎉 All cleared!</p>`;
+    return h + `<div class="navrow">${hasRedo ? '<button data-act="redoAgain">Keep going ▶</button>' : ''}<button class="alt" data-act="done">Done</button></div>`;
+  }
+  const {right, n} = s.result;
+  const pass = right * 100 >= s.passMark * n;
+  let h = `<section class="card center"><p class="muted">${MODES[s.mode]} · ${esc(s.label)}</p><div class="big">${pct(right, n)}%</div>
+    <p><b>${right} of ${n} right</b></p><p><span class="badge ${pass ? 'pass' : 'fail'}">${pass ? '✅ PASS' : '❌ FAIL'}</span></p><p class="muted">Pass mark: ${s.passMark}%</p></section>`;
+  const items = [];
+  s.items.forEach((it, i) => { if (s.mode === 'exam' || it.pick !== null) items.push([it, i + 1]); });
+  const wrong = items.filter(([it]) => { const q = qById(it.qid); return q && it.pick !== q.answer; });
+  const good = items.filter(([it]) => { const q = qById(it.qid); return q && it.pick === q.answer; });
+  h += wrong.length ? `<h2>Let’s look at the ${wrong.length === 1 ? 'one' : wrong.length} you missed</h2>` + wrong.map(([it, k]) => reviewHtml(it, k)).join('')
+    : `<p class="card ok">🎉 You got them all right!</p>`;
+  if (good.length) {
+    h += `<button class="alt wide" data-act="toggleRight">${UI.showRight ? 'Hide' : 'Show'} the ${good.length === 1 ? 'one' : good.length} you got right</button>`;
+    if (UI.showRight) h += good.map(([it, k]) => reviewHtml(it, k)).join('');
+  }
+  return h + `<div class="navrow">${hasRedo ? '<button data-act="redoAgain">🔁 Redo my wrong ones</button>' : ''}<button class="alt" data-act="done">Done</button></div>`;
+}
+function qRowHtml(q) {
+  return `<div class="qrow"><p>${q.st.redo ? '🔁 ' : ''}${esc(q.q)}</p><div class="row"><button class="alt sm" data-act="editQ" data-id="${esc(q.id)}">✏️ Edit</button>${confirmBtn('delQ', 'del-' + q.id, '🗑 Delete', 'Tap again to delete', 'danger sm', `data-id="${esc(q.id)}"`)}</div></div>`;
+}
+function qListHtml() {
+  const f = normKey(UI.find);
+  if (f) {
+    const hits = S.bank.filter(q => normKey(q.q).includes(f) || normKey(q.options.join(' ')).includes(f));
+    return hits.length ? `<p class="muted">${plural(hits.length, 'match', 'matches')}</p><section class="card">` + hits.slice(0, 100).map(qRowHtml).join('') + `</section>` : `<p class="muted">No matches.</p>`;
+  }
+  return chapters().map(c => {
+    const qs = S.bank.filter(q => q.chapter === c), open = UI.openCh === c, redo = qs.filter(q => q.st.redo).length;
+    return `<section class="card"><button class="chhead" data-act="toggleCh" data-ch="${esc(c)}" aria-expanded="${open}"><span>${open ? '▾' : '▸'} ${esc(c)}</span><span class="muted">${qs.length}${redo ? ` · 🔁 ${redo}` : ''}</span></button>${open ? qs.map(qRowHtml).join('') : ''}</section>`;
+  }).join('');
+}
+function viewQuestions() {
+  if (UI.qsub === 'paste') return viewPaste();
+  if (UI.qsub === 'make') return viewMake();
+  if (UI.qsub === 'edit') return viewEdit();
+  let h = msgHtml('questions') + `<h1>Questions</h1><div class="stack">
+    <button class="wide" data-act="goMake">✨ Make new questions with Claude</button>
+    <button class="wide alt" data-act="goPaste">📋 Paste questions</button>
+    <button class="wide alt" data-act="newQ">✏️ Add one by hand</button></div>`;
+  if (!S.bank.length) return h + `<p class="card">No questions yet.</p>`;
+  h += `<p class="muted">${plural(S.bank.length, 'question')} in ${plural(chapters().length, 'chapter')}. Tap a chapter to see its questions.</p>
+    <label for="find">Find a question</label><input id="find" type="search" data-ui-live="find" value="${esc(UI.find)}" placeholder="Type a word…" autocomplete="off">
+    <div id="qlist">${qListHtml()}</div>`;
+  return h;
+}
+function viewPaste() {
+  return `<button class="link" data-act="qback">◀ Back to questions</button><h1>📋 Paste questions</h1>${msgHtml('paste')}
+    <ol class="steps"><li>Copy the questions Claude gave you. They start with <b>[</b> and end with <b>]</b>.</li><li>Paste them in the box.</li><li>Press <b>Add questions</b>.</li></ol>
+    <textarea id="pasteBox" data-ui-live="pasteDraft" spellcheck="false" autocomplete="off" aria-label="Paste questions here" placeholder="Paste here">${esc(UI.pasteDraft)}</textarea>
+    <button class="wide" data-act="doPaste">➕ Add questions</button>`;
+}
+function buildPrompt() {
+  const ch = cleanStr(UI.makeCh) || 'Chapter name';
+  const n = clampInt(UI.makeN, 1, 100, 20);
+  return `Make ${n} multiple-choice study questions for "${ch}" using ONLY the course material I attached.
+
+RULES
+- Use only facts from the attached material. Don't ask about anything that isn't in it.
+- Each question has 4 answers. Only 1 is correct. Make the wrong answers believable.
+- Mix up where the correct answer is (not always the same spot).
+- Keep the words short and clear. I'm dyslexic.
+- "why": 1 or 2 short sentences on why the right answer is correct. Include the code clause or section number from the material when there is one.
+- "wrongWhy": 1 short sentence for each answer on why it's wrong. Use "" for the correct answer.
+- "hook": a memory hook that links the answer to a feeling I can feel in the moment, from everyday life (home, driving, the gym, the shop floor). Make it relatable. No dry comparisons.
+
+Reply with ONLY the JSON below, nothing else. "answer" is the position of the correct answer, starting at 0 (0 = first answer).
+
+[{"chapter":${JSON.stringify(ch)},"q":"question","options":["answer 1","answer 2","answer 3","answer 4"],"answer":0,"why":"why the right answer is correct","wrongWhy":["","why answer 2 is wrong","why answer 3 is wrong","why answer 4 is wrong"],"hook":"feeling-based memory hook"}]`;
+}
+function viewMake() {
+  return `<button class="link" data-act="qback">◀ Back to questions</button><h1>✨ Make questions with Claude</h1>
+    ${navigator.onLine ? '' : '<p class="card warn">📴 You’re offline. You can copy the prompt now, but Claude needs internet.</p>'}
+    ${msgHtml('make')}
+    <label for="makeCh">Chapter name</label><input id="makeCh" data-ui-live="makeCh" value="${esc(UI.makeCh)}" placeholder="Example: Ch 3 Weld symbols" autocomplete="off">
+    <label for="makeN">How many questions?</label><select id="makeN" data-ui="makeN">${['10', '20', '30', '40', '50'].map(v => `<option value="${v}" ${UI.makeN === v ? 'selected' : ''}>${v}</option>`).join('')}</select>
+    <button class="wide" data-act="copyPrompt">📋 Copy the prompt</button>
+    <ol class="steps"><li>Press <b>Copy the prompt</b>.</li><li>Open Claude. Attach your chapter file and paste the prompt.</li><li>Copy everything Claude writes back.</li><li>Come back here and press <b>Paste questions</b>.</li></ol>
+    <button class="wide alt" data-act="goPaste">📋 Paste questions</button>
+    <details id="promptDetails" ${UI.showPrompt ? 'open' : ''}><summary>See the prompt</summary><textarea id="promptBox" readonly aria-label="The prompt">${esc(buildPrompt())}</textarea></details>
+    <p class="muted">Free: this uses your own Claude. No extra AI service.</p>`;
+}
+function blankDraft() { return {chapter: UI.lastCh || '', q: '', options: ['', '', '', ''], answer: -1, why: '', wrongWhy: ['', '', '', ''], hook: ''}; }
+function draftFrom(q) { return {chapter: q.chapter, q: q.q, options: q.options.slice(), answer: q.answer, why: q.why, wrongWhy: q.wrongWhy.slice(), hook: q.hook}; }
+function readEditForm() {
+  const d = UI.editDraft;
+  if (!d || !$('#eQ')) return;
+  d.chapter = $('#eCh').value; d.q = $('#eQ').value; d.why = $('#eWhy').value; d.hook = $('#eHook').value;
+  d.options = d.options.map((o, i) => { const el = $('#eO' + i); return el ? el.value : o; });
+  d.wrongWhy = d.options.map((_, i) => { const el = $('#eW' + i); return el ? el.value : (d.wrongWhy[i] || ''); });
+  const r = document.querySelector('input[name="eAns"]:checked');
+  d.answer = r ? Number(r.value) : -1;
+}
+function viewEdit() {
+  const d = UI.editDraft;
+  if (!d) { UI.qsub = null; return viewQuestions(); }
+  let h = `<button class="link" data-act="cancelEdit">◀ Back to questions</button><h1>${UI.editId ? '✏️ Edit question' : '✏️ Add a question'}</h1>${msgHtml('edit')}
+    <label for="eCh">Chapter</label><input id="eCh" value="${esc(d.chapter)}" list="chList" autocomplete="off" placeholder="Example: Ch 1"><datalist id="chList">${chapters().map(c => `<option value="${esc(c)}">`).join('')}</datalist>
+    <label for="eQ">Question</label><textarea id="eQ" rows="3">${esc(d.q)}</textarea>
+    <fieldset><legend>Answers</legend><p class="muted">Tap the circle next to the right answer.</p>`;
+  h += d.options.map((o, i) => `<div class="erow"><label class="radio"><input type="radio" name="eAns" value="${i}" ${d.answer === i ? 'checked' : ''} aria-label="${LETTERS[i]} is the right answer"><b>${LETTERS[i]}</b></label>
+    <input id="eO${i}" value="${esc(o)}" placeholder="Answer ${LETTERS[i]}" aria-label="Answer ${LETTERS[i]}">
+    <input id="eW${i}" class="small" value="${esc(d.wrongWhy[i] || '')}" placeholder="Why ${LETTERS[i]} is wrong (skip for the right one)" aria-label="Why answer ${LETTERS[i]} is wrong"></div>`).join('');
+  h += `<div class="row">${d.options.length < 6 ? '<button class="alt sm" data-act="addOpt">＋ Add an answer</button>' : ''}${d.options.length > 2 ? '<button class="alt sm" data-act="remOpt">− Remove the last answer</button>' : ''}</div></fieldset>
+    <label for="eWhy">Why the right answer is right</label><textarea id="eWhy" rows="2">${esc(d.why)}</textarea>
+    <label for="eHook">💡 Memory hook</label><textarea id="eHook" rows="2">${esc(d.hook)}</textarea>
+    <div class="navrow"><button class="alt" data-act="cancelEdit">Cancel</button><button data-act="saveEdit">💾 Save</button></div>`;
+  return h;
+}
+function viewScores() {
+  let h = msgHtml('scores') + '<h1>Scores</h1>';
+  if (!S.hist.length) return h + '<p class="card">No tests yet. Your scores will show up here.</p>' + weakestHtml();
+  const tests = S.hist.filter(x => x.mode !== 'redo');
+  const last5 = tests.slice(0, 5);
+  const avg = last5.length ? Math.round(last5.reduce((a, x) => a + 100 * x.right / x.n, 0) / last5.length) : null;
+  h += `<section class="card"><p><b>${plural(tests.length, 'test')}</b> taken.${avg !== null ? ` Average of your last ${last5.length}: <b>${avg}%</b>` : ''}</p></section>`;
+  h += weakestHtml();
+  h += `<h2>History</h2><section class="card">` + S.hist.slice(0, 200).map(x =>
+    `<div class="hrow"><div><b>${MODES[x.mode]}</b> · ${esc(x.label)}<br><span class="muted">${esc(fmtDate(x.date))}</span></div><div class="hscore">${x.right}/${x.n} · ${pct(x.right, x.n)}%${x.pass === true ? ' ✅' : x.pass === false ? ' ❌' : ''}</div></div>`).join('') + `</section>`;
+  return h + confirmBtn('clearHist', 'clearHist', '🗑 Clear score history', 'Tap again to clear all scores', 'danger wide');
+}
+function canShareFiles() {
+  try { return !!(navigator.share && navigator.canShare && navigator.canShare({files: [new File(['{}'], 'test.json', {type: 'application/json'})]})); }
+  catch (e) { return false; }
+}
+function storageText() {
+  const counts = `${plural(S.bank.length, 'question')} and ${plural(S.hist.length, 'score')} saved.`;
+  if (storage === 'memory' || saveFailed) return `⚠️ This device isn’t saving your work. Save a backup before you close the app.`;
+  if (storage === 'local') return `${counts} Saved in basic browser storage. Back up often.`;
+  return `${counts} ${persisted ? '✅ Saved on this device and protected from being cleared.' : '✅ Saved on this device. Back up now and then to be safe.'}`;
+}
+function installHtml() {
+  let body;
+  if (isStandalone()) body = '<p>✅ Installed. Open it from your home screen icon.</p>';
+  else if (deferredInstall) body = '<button class="wide" data-act="install">📲 Install this app</button>';
+  else if (isIOS()) body = '<ol class="steps"><li>Open this page in <b>Safari</b>.</li><li>Tap <b>Share</b> (the square with the arrow).</li><li>Tap <b>Add to Home Screen</b>.</li></ol>';
+  else body = '<p>In Chrome or Edge, open the browser menu (⋮) and pick <b>Install app</b> or <b>Add to Home screen</b>.</p>';
+  return `<section class="card"><h2>📲 Install</h2>${body}<p class="muted">Always open it from the icon. Then it works offline.</p></section>`;
+}
+function viewSettings() {
+  const demoN = S.bank.filter(q => q.demo).length;
+  let h = msgHtml('settings') + '<h1>Settings</h1>';
+  h += `<section class="card"><h2>Pass mark</h2><div class="row"><button class="alt sm" data-act="passDown" aria-label="Lower the pass mark">−</button><span class="big2" id="passVal">${S.settings.pass}%</span><button class="alt sm" data-act="passUp" aria-label="Raise the pass mark">+</button></div><p class="muted">Goes up or down by 5. Starts at 70%.</p></section>`;
+  h += `<section class="card"><h2>Text size</h2><div class="row">${SIZES.map((px, i) => `<button class="${S.settings.size === i ? '' : 'alt'} sm" data-act="size" data-size="${i}" aria-pressed="${S.settings.size === i}" aria-label="Text size ${i + 1}" style="font-size:${px}px">Aa</button>`).join('')}</div></section>`;
+  h += `<section class="card" id="backup"><h2>💾 Back up</h2><p class="muted">Last backup: ${S.lastBackup ? esc(fmtDate(S.lastBackup)) : 'never'}</p>
+    <button class="wide" data-act="exportFile">💾 Save backup file</button>
+    ${canShareFiles() ? '<button class="wide alt" data-act="shareBackup">📤 Share backup (email, Drive, Files)</button>' : ''}
+    <button class="wide alt" data-act="copyBackup">📋 Copy backup as text</button>
+    <h3>Restore</h3><p class="muted">Adds the questions and scores from a backup. Nothing gets deleted.</p>
+    <label class="btn alt wide" for="importFile">📂 Restore from a backup file</label><input id="importFile" type="file" accept=".json,application/json,text/plain" class="visually-hidden">
+    <details id="restoreDetails" ${UI.showRestorePaste ? 'open' : ''}><summary>Restore from pasted text</summary>
+    <textarea id="restoreBox" data-ui-live="restoreDraft" spellcheck="false" aria-label="Paste backup text">${esc(UI.restoreDraft)}</textarea>
+    <button class="wide alt" data-act="restorePaste">Restore</button></details></section>`;
+  h += installHtml();
+  h += `<section class="card"><h2>📦 Storage</h2><p>${storageText()}</p></section>`;
+  h += `<section class="card"><h2>Clean up</h2>${demoN ? `<button class="alt wide" data-act="delDemo">Remove the ${plural(demoN, 'demo question')}</button>` : ''}
+    ${confirmBtn('wipe', 'wipe', '🗑 Delete everything', 'Tap again to delete ALL questions and scores', 'danger wide')}<p class="muted">Tip: save a backup first.</p></section>
+    <p class="muted center">CWB Test Maker v${VERSION}</p>`;
+  return h;
+}
+
+/* ---------- render ---------- */
+const TABS = [['study', '📚', 'Study'], ['questions', '❓', 'Questions'], ['scores', '📈', 'Scores'], ['settings', '⚙️', 'Settings']];
+function renderNav() {
+  $('#nav').innerHTML = TABS.map(([k, i, l]) => `<button class="tab ${UI.tab === k ? 'on' : ''}" data-act="tab" data-tab="${k}" ${UI.tab === k ? 'aria-current="page"' : ''}><span class="ti" aria-hidden="true">${i}</span><span class="tl">${l}</span></button>`).join('');
+}
+function inQuiz() { const s = S && S.session; return UI.tab === 'study' && s && !s.finished && !UI.resumeAsk; }
+function backupDue() {
+  if (!S.bank.some(q => !q.demo)) return false;
+  const now = Date.now();
+  if (S.snoozeUntil && now < Date.parse(S.snoozeUntil)) return false;
+  return now - Date.parse(S.lastBackup || S.created) >= 7 * DAY;
+}
+function renderBanner() {
+  const b = $('#banner');
+  if (!b || !S) return;
+  let h = '';
+  if (storage === 'memory' || saveFailed) h += `<div class="banner bad">⚠️ This device isn’t saving your work. Save a backup before you close the app. <button class="sm" data-act="goBackup">Back up</button></div>`;
+  else if (!inQuiz()) {
+    if (!navigator.onLine) h += `<div class="banner info">📴 Offline. Everything still works. Making new questions needs internet.</div>`;
+    if (backupDue()) h += `<div class="banner warn">💾 It’s been over 7 days since your last backup.<div class="row" style="margin-top:6px"><button class="sm" data-act="goBackup">Back up now</button><button class="sm alt" data-act="snooze">Remind me tomorrow</button></div></div>`;
+  }
+  b.innerHTML = h;
+}
+function render(toTop) {
+  if (!S) return;
+  fixSession();
+  renderNav();
+  renderBanner();
+  let h;
+  if (UI.tab === 'questions') h = viewQuestions();
+  else if (UI.tab === 'scores') h = viewScores();
+  else if (UI.tab === 'settings') h = viewSettings();
+  else { const s = S.session; h = !s ? viewStudy() : s.finished ? viewResults() : UI.resumeAsk ? viewResume() : viewQuiz(); }
+  $('#app').innerHTML = h;
+  if (toTop) {
+    window.scrollTo(0, 0);
+    const f = $('#qtext');
+    if (f) f.focus({preventScroll: true});
+  }
+}
+function go(tab, sub) { UI.tab = tab; UI.qsub = sub || null; UI.msg = null; UI.confirmFinish = false; render(true); }
+function flash(view, kind, text) { UI.msg = {view, kind, text}; render(); const m = $('#app .msg'); if (m && m.scrollIntoView) m.scrollIntoView({block: 'nearest'}); }
+
+/* ---------- actions ---------- */
+function applySize() { document.documentElement.style.setProperty('--fs', SIZES[S.settings.size] + 'px'); }
+function markBackedUp() { S.lastBackup = nowISO(); S.snoozeUntil = null; save(); }
+function backupText() { return JSON.stringify({app: 'cwb-test-maker', version: 1, exported: nowISO(), bank: S.bank, hist: S.hist, settings: S.settings}, null, 1); }
+function backupName() { const d = new Date(), p = n => String(n).padStart(2, '0'); return `test-maker-backup-${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}.json`; }
+async function copyText(text) {
+  try { if (navigator.clipboard && navigator.clipboard.writeText) { await navigator.clipboard.writeText(text); return true; } } catch (e) {}
+  try {
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.top = '0'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select(); ta.setSelectionRange(0, text.length);
+    const ok = document.execCommand('copy'); ta.remove(); return ok;
+  } catch (e) { return false; }
+}
+function readFileText(f) {
+  if (f.text) return f.text();
+  return new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result)); r.onerror = () => rej(r.error); r.readAsText(f); });
+}
+function importBackup(text) {
+  let data = null;
+  try { data = JSON.parse(String(text || '').trim()); } catch (e) { const r = parseQuestions(text); data = r.error ? null : r.list; }
+  let list = null, hist = [], settings = null;
+  if (Array.isArray(data)) list = data;
+  else if (data && typeof data === 'object' && Array.isArray(data.bank)) { list = data.bank; hist = Array.isArray(data.hist) ? data.hist : []; settings = data.settings; }
+  if (!list) { flash('settings', 'bad', 'That isn’t a Test Maker backup. Nothing was changed.'); return false; }
+  const res = addQuestions(S, list, true);
+  const ids = new Set(S.hist.map(x => x.id));
+  let hAdded = 0;
+  hist.map(cleanHist).filter(Boolean).forEach(x => { if (!ids.has(x.id)) { S.hist.push(x); ids.add(x.id); hAdded++; } });
+  S.hist.sort((a, b) => b.date.localeCompare(a.date));
+  if (settings && typeof settings === 'object') {
+    S.settings.pass = clampInt(settings.pass, 1, 100, S.settings.pass);
+    S.settings.size = clampInt(settings.size, 0, SIZES.length - 1, S.settings.size);
+    applySize();
+  }
+  save();
+  let msg = `✅ Restored ${plural(res.added, 'question')} and ${plural(hAdded, 'score')}.`;
+  if (res.dup) msg += `\n⏭️ ${plural(res.dup, 'question was', 'questions were')} already here.`;
+  if (res.bad.length) msg += `\n⚠️ ${plural(res.bad.length, 'question')} couldn’t be read.`;
+  flash('settings', res.added || hAdded || res.dup ? 'ok' : 'bad', msg);
+  return true;
+}
+function doPaste() {
+  const box = $('#pasteBox');
+  const text = box ? box.value : UI.pasteDraft;
+  UI.pasteDraft = text;
+  const r = parseQuestions(text);
+  if (r.error) { flash('paste', 'bad', r.error); return; }
+  const res = addQuestions(S, r.list, false);
+  const lines = [];
+  if (res.added) lines.push(`✅ Added ${plural(res.added, 'question')}.`);
+  if (res.dup) lines.push(`⏭️ Skipped ${res.dup} already in your bank.`);
+  if (res.bad.length) {
+    lines.push(`⚠️ ${plural(res.bad.length, 'question')} couldn’t be added:`);
+    res.bad.slice(0, 10).forEach(b => lines.push(`• Question ${b.n}: ${b.why}.`));
+    if (res.bad.length > 10) lines.push(`• …and ${res.bad.length - 10} more.`);
+  }
+  if (!lines.length) lines.push('There were no questions in that paste.');
+  if (res.added) { UI.pasteDraft = ''; save(); }
+  flash('paste', res.added ? 'ok' : 'bad', lines.join('\n'));
+}
+function saveEdit() {
+  readEditForm();
+  const d = UI.editDraft;
+  if (!d) return;
+  if (d.answer < 0) { flash('edit', 'bad', 'Can’t save yet: tap the circle next to the right answer.'); return; }
+  const v = validateQ(d);
+  if (!v.ok) { flash('edit', 'bad', `Can’t save yet: ${v.why}.`); return; }
+  const k = normKey(v.q.q);
+  if (S.bank.some(x => x.id !== UI.editId && normKey(x.q) === k)) { flash('edit', 'bad', 'Can’t save yet: you already have a question with the same words.'); return; }
+  const isNew = !UI.editId;
+  if (isNew) S.bank.push(makeQ(v.q));
+  else { const q = qById(UI.editId); if (!q) { flash('edit', 'bad', 'That question was deleted.'); return; } Object.assign(q, v.q); q.demo = false; }
+  UI.lastCh = v.q.chapter; UI.openCh = v.q.chapter; UI.find = '';
+  UI.editDraft = null; UI.editId = null;
+  save();
+  UI.qsub = null;
+  flash('questions', 'ok', isNew ? '✅ Question added.' : '✅ Question saved.');
+}
+async function exportFile() {
+  try {
+    const blob = new Blob([backupText()], {type: 'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = backupName(); a.rel = 'noopener';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 30000);
+    markBackedUp();
+    flash('settings', 'ok', '✅ Backup file saved. Check your Downloads (or Files on a phone).');
+  } catch (e) { flash('settings', 'bad', 'Saving the file didn’t work here. Try “Copy backup as text” instead.'); }
+}
+async function shareBackup() {
+  try {
+    const f = new File([backupText()], backupName(), {type: 'application/json'});
+    await navigator.share({files: [f], title: 'Test Maker backup'});
+    markBackedUp();
+    flash('settings', 'ok', '✅ Backup shared.');
+  } catch (e) {
+    if (e && e.name === 'AbortError') return;
+    flash('settings', 'bad', 'Sharing didn’t work. Try “Save backup file” or “Copy backup as text”.');
+  }
+}
+const ACTIONS = {
+  tab: b => go(b.dataset.tab),
+  goPaste: () => go('questions', 'paste'),
+  goMake: () => go('questions', 'make'),
+  qback: () => go('questions'),
+  newQ: () => { UI.editId = null; UI.editDraft = blankDraft(); go('questions', 'edit'); },
+  editQ: b => { const q = qById(b.dataset.id); if (!q) return; UI.editId = q.id; UI.editDraft = draftFrom(q); go('questions', 'edit'); },
+  cancelEdit: () => { UI.editDraft = null; UI.editId = null; go('questions'); },
+  addOpt: () => { readEditForm(); const d = UI.editDraft; if (d && d.options.length < 6) { d.options.push(''); d.wrongWhy.push(''); } render(); },
+  remOpt: () => { readEditForm(); const d = UI.editDraft; if (d && d.options.length > 2) { d.options.pop(); d.wrongWhy.pop(); if (d.answer >= d.options.length) d.answer = -1; } render(); },
+  saveEdit,
+  delQ: b => { const i = S.bank.findIndex(q => q.id === b.dataset.id); if (i < 0) return; S.bank.splice(i, 1); save(); flash('questions', 'ok', '🗑 Question deleted.'); },
+  toggleCh: b => { const c = b.dataset.ch; UI.openCh = UI.openCh === c ? null : c; render(); },
+  doPaste,
+  copyPrompt: async () => {
+    if (!cleanStr(UI.makeCh)) { flash('make', 'bad', 'Type the chapter name first.'); const el = $('#makeCh'); if (el) el.focus(); return; }
+    const ok = await copyText(buildPrompt());
+    if (ok) flash('make', 'ok', '✅ Copied! Now open Claude, attach your chapter file, and paste.');
+    else { UI.showPrompt = true; flash('make', 'bad', 'Copy didn’t work here. Open “See the prompt” below, then press and hold the text to copy it.'); }
+  },
+  startLearn: () => startLearn(UI.learnCh, UI.learnN),
+  startExam: () => startExam(),
+  startRedo: () => startRedo(),
+  practiceCh: b => startLearn(b.dataset.ch, '10'),
+  pick: b => pick(Number(b.dataset.orig)),
+  next: () => next(),
+  back: () => back(),
+  finishNow: () => { const s = S.session; if (!s) return; if (s.mode === 'exam') finishAsk(); else finishTest(); },
+  finishTest: () => finishTest(),
+  gotoUnanswered: () => { const s = S.session; if (!s || !s.items) return; const i = s.items.findIndex(x => x.pick === null); if (i >= 0) s.i = i; UI.confirmFinish = false; save(); render(true); },
+  pause: () => { UI.resumeAsk = true; render(true); },
+  resume: () => { UI.resumeAsk = false; UI.msg = null; render(true); },
+  discard: () => { S.session = null; UI.resumeAsk = false; save(); flash('study', 'ok', '🗑 Test thrown away.'); },
+  done: () => { S.session = null; save(); go('study'); },
+  toggleRight: () => { UI.showRight = !UI.showRight; render(); },
+  redoAgain: () => { S.session = null; save(); startRedo(); },
+  stopRedo: () => finishRedo(),
+  passDown: () => { S.settings.pass = Math.max(5, Math.round((S.settings.pass - 5) / 5) * 5); save(); render(); },
+  passUp: () => { S.settings.pass = Math.min(100, Math.round((S.settings.pass + 5) / 5) * 5); save(); render(); },
+  size: b => { S.settings.size = clampInt(b.dataset.size, 0, SIZES.length - 1, 1); applySize(); save(); render(); },
+  exportFile: () => exportFile(),
+  shareBackup: () => shareBackup(),
+  copyBackup: async () => {
+    const ok = await copyText(backupText());
+    if (ok) { markBackedUp(); flash('settings', 'ok', '✅ Backup copied. Paste it somewhere safe, like an email to yourself or a note.'); }
+    else flash('settings', 'bad', 'Copy didn’t work here. Try “Save backup file” instead.');
+  },
+  restorePaste: () => { const box = $('#restoreBox'); const t = box ? box.value : UI.restoreDraft; if (!cleanStr(t)) { flash('settings', 'bad', 'Paste your backup text in the box first.'); return; } if (importBackup(t)) UI.restoreDraft = ''; render(); },
+  delDemo: () => { const n = S.bank.length; S.bank = S.bank.filter(q => !q.demo); save(); flash('settings', 'ok', `🗑 Removed ${plural(n - S.bank.length, 'demo question')}.`); },
+  wipe: () => { S = freshState(false); UI.resumeAsk = false; UI.openCh = null; UI.find = ''; applySize(); save(); flash('settings', 'ok', '🗑 Everything was deleted.'); },
+  clearHist: () => { S.hist = []; save(); flash('scores', 'ok', '🗑 Score history cleared.'); },
+  goBackup: () => { go('settings'); const el = $('#backup'); if (el && el.scrollIntoView) el.scrollIntoView({block: 'start'}); },
+  snooze: () => { S.snoozeUntil = new Date(Date.now() + DAY).toISOString(); save(); renderBanner(); },
+  install: () => { const p = deferredInstall; if (!p) return; deferredInstall = null; p.prompt(); (p.userChoice || Promise.resolve()).then(() => render(), () => render()); }
+};
+function disarm() {
+  clearTimeout(UI.armTimer);
+  if (UI.armed) {
+    const prev = document.querySelector(`[data-confirm="${CSS.escape(UI.armed)}"]`);
+    if (prev && prev.dataset.orig !== undefined) { prev.innerHTML = prev.dataset.orig; prev.classList.remove('armed'); delete prev.dataset.orig; }
+  }
+  UI.armed = null;
+}
+function arm(b) {
+  UI.armed = b.dataset.confirm;
+  b.dataset.orig = b.innerHTML;
+  b.textContent = b.dataset.confirmText || 'Tap again to confirm';
+  b.classList.add('armed');
+  UI.armTimer = setTimeout(disarm, 5000);
+}
+function showError(err) {
+  console.error(err);
+  const b = $('#banner');
+  if (!b) return;
+  const d = document.createElement('div');
+  d.className = 'banner bad';
+  d.textContent = '⚠️ Something went wrong. Your saved work is safe. If it keeps happening, close and reopen the app.';
+  b.appendChild(d);
+  setTimeout(() => d.remove(), 8000);
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-act]');
+  if (!b || b.disabled || !S) return;
+  if (b.dataset.confirm) {
+    if (UI.armed !== b.dataset.confirm) { disarm(); arm(b); return; }
+    disarm();
+  } else if (UI.armed) disarm();
+  ensurePersist();
+  const fn = ACTIONS[b.dataset.act];
+  if (!fn) return;
+  try { const r = fn(b, e); if (r && r.catch) r.catch(showError); } catch (err) { showError(err); }
+});
+document.addEventListener('change', e => {
+  const t = e.target;
+  if (!S || !t.dataset) return;
+  if (t.dataset.ui) {
+    UI[t.dataset.ui] = t.value;
+    if (t.dataset.ui === 'makeN') { const p = $('#promptBox'); if (p) p.value = buildPrompt(); }
+    return;
+  }
+  if (t.dataset.uiCheck === 'examAll') { UI.examAll = t.checked; render(); return; }
+  if (t.dataset.exch !== undefined) { const c = t.dataset.exch; UI.examChs = t.checked ? [...new Set(UI.examChs.concat(c))] : UI.examChs.filter(x => x !== c); return; }
+  if (t.id === 'importFile' && t.files && t.files[0]) {
+    const f = t.files[0];
+    t.value = '';
+    if (f.size > 25 * 1024 * 1024) { flash('settings', 'bad', 'That file is too big to be a backup.'); return; }
+    readFileText(f).then(importBackup, () => flash('settings', 'bad', 'Couldn’t read that file.')).catch(showError);
+  }
+});
+document.addEventListener('input', e => {
+  const t = e.target, k = t.dataset && t.dataset.uiLive;
+  if (!k || !S) return;
+  UI[k] = t.value;
+  if (k === 'find') { const l = $('#qlist'); if (l) l.innerHTML = qListHtml(); }
+  if (k === 'makeCh') { const p = $('#promptBox'); if (p) p.value = buildPrompt(); }
+});
+document.addEventListener('toggle', e => {
+  if (e.target.id === 'restoreDetails') UI.showRestorePaste = e.target.open;
+  if (e.target.id === 'promptDetails') UI.showPrompt = e.target.open;
+}, true);
+document.addEventListener('keydown', e => {
+  if (!S || e.altKey || e.ctrlKey || e.metaKey || !inQuiz()) return;
+  const tag = (e.target.tagName || '').toLowerCase();
+  if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
+  const k = e.key.toLowerCase();
+  let pos = k.length === 1 ? '123456'.indexOf(k) : -1;
+  if (pos < 0 && k.length === 1) pos = 'abcdef'.indexOf(k);
+  if (pos >= 0) { const btn = document.querySelectorAll('.opt')[pos]; if (btn && !btn.disabled) { e.preventDefault(); btn.click(); } return; }
+  if (tag === 'button' && (k === 'enter' || k === ' ')) return;
+  if (k === 'enter' || k === 'arrowright') { const nb = $('[data-act="next"]'); if (nb && !nb.disabled) { e.preventDefault(); nb.click(); } }
+  else if (k === 'arrowleft') { const bb = $('[data-act="back"]'); if (bb && !bb.disabled) { e.preventDefault(); bb.click(); } }
+});
+window.addEventListener('online', () => { if (S) { renderBanner(); if (UI.qsub === 'make') render(); } });
+window.addEventListener('offline', () => { if (S) { renderBanner(); if (UI.qsub === 'make') render(); } });
+window.addEventListener('error', e => showError(e.error || e.message));
+window.addEventListener('unhandledrejection', e => showError(e.reason));
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredInstall = e; if (S && UI.tab === 'settings') render(); });
+window.addEventListener('appinstalled', () => { deferredInstall = null; if (S && UI.tab === 'settings') render(); });
+
+/* ---------- start ---------- */
+async function init() {
+  try { S = await loadState(); }
+  catch (e) { console.error(e); S = freshState(true); storage = 'memory'; }
+  applySize();
+  if (S.session && !S.session.finished) UI.resumeAsk = true;
+  if (navigator.storage && navigator.storage.persisted) navigator.storage.persisted().then(p => { persisted = p; }).catch(() => {});
+  render();
+  if (!S.savedAt) save();
+}
+if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
+  navigator.serviceWorker.register('./sw.js').catch(e => console.warn('Offline mode not available', e));
+}
+init();
+</script>
+</body>
+</html>

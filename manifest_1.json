@@ -1,0 +1,17 @@
+{
+  "id": "./",
+  "name": "CWB Test Maker",
+  "short_name": "Test Maker",
+  "description": "Free offline study app for CWB Visual Level 2. Make tests, take them and get them marked.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#fbf7ee",
+  "theme_color": "#1f5fa8",
+  "icons": [
+    {"src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+    {"src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
+    {"src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  ]
+}
